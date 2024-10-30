@@ -64,7 +64,6 @@ def save_to_excel(file_name_hunt,selected_rows, alternate_rows,randomized_prev_a
     file_name = file_name_hunt + f"_selected_{timestamp}.xlsx"
     
     # Create an Excel writer
-
     with pd.ExcelWriter(file_name) as writer:
         # Write primary selected rows to the first sheet
         selected_rows.to_excel(writer, sheet_name="Primary Rows", index=False)
@@ -77,11 +76,14 @@ def save_to_excel(file_name_hunt,selected_rows, alternate_rows,randomized_prev_a
     
     print(f"Data saved to {file_name}")
 
+# Randomize all of the attendees who have attended past events
 def randomize_previous_attendee_list(previous_attendee_list):
     randomized_prev_attendee_list = previous_attendee_list.sample(frac=1).reset_index(drop=True)
     return randomized_prev_attendee_list
 
 def main():
+
+    # Get input file
     file_path = askopenfilename(
         filetypes=[("CSV Files", "*.csv"), ("TSV Files", "*.tsv")],
         title="Select the CSV/TSV File"
@@ -99,16 +101,19 @@ def main():
     # Take out all banned members AND previous attendees from consideration
     filtered_data,previous_attendee_list_rsvps = filter_list(original_data,banned_list,previous_attendee_list)
 
+    # Get numbers you need
     number_of_attendees = input("Input number of attendees: ")
     number_of_alternates = input("Input number of alternates needed: ")
 
-
+    # Randomly selects winners
     selected_data,alternate_rows,remaining_number_needed = select_random_rows(filtered_data, int(number_of_attendees),int(number_of_alternates))
 
     randomized_prev_attendee_list = pd.DataFrame()
+    # If we still need more people to fill event, grab from those who have attended past events
     if remaining_number_needed > 0:
         randomized_prev_attendee_list = randomize_previous_attendee_list(previous_attendee_list_rsvps)
 
+    # Write to an excel file
     if selected_data is not None and alternate_rows is not None:
         file_name_hunt = Path(file_path).name
         file_name_hunt = file_name_hunt.split(".")[0]
