@@ -33,6 +33,9 @@ def select_random_rows(filtered_data, number_of_attendees,num_alternates):
 
     selected_rows = pd.DataFrame()
     alternate_rows = pd.DataFrame()
+
+    actual_number_of_attendees = number_of_attendees
+    actual_num_alternates = num_alternates
     
     # Check if num_rows is greater than the number of rows in the file
     if number_of_attendees > len(filtered_data):
@@ -61,7 +64,7 @@ def select_random_rows(filtered_data, number_of_attendees,num_alternates):
 def save_to_excel(file_name_hunt,selected_rows, alternate_rows,randomized_prev_attendee_list):
     # Get current timestamp for unique file naming
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = file_name_hunt + f"_selected_{timestamp}.xlsx"
+    file_name = f"selected_{timestamp}_" + file_name_hunt + ".xlsx"
     
     # Create an Excel writer
     with pd.ExcelWriter(file_name) as writer:
