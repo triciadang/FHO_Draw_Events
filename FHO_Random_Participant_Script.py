@@ -5,12 +5,24 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from pathlib import Path
 
+def clean_and_upper(df):
+    #This function takes a pandas dataframe, runs through each entry, 
+    # removes whitespace, and makes the text uppercase.
+
+    return df.applymap(lambda x: x.strip().upper() if isinstance(x, str) else x)
+
 def load_banned_list(banned_file_path):
     # Load the banned list as a DataFrame
     banned_data = pd.read_csv(banned_file_path, sep=',')
     return banned_data
 
 def filter_list(original_data, banned_list,previous_attendee_list):
+
+    #Makes sure case-insensitive and removes whitespace
+    original_data = clean_and_upper(original_data)
+    banned_list = clean_and_upper(banned_list)
+    previous_attendee_list = clean_and_upper(previous_attendee_list)
+
     merged = original_data.merge(banned_list, on=['First name','Last name'],how='left',indicator=True)
     filtered_data = merged[merged['_merge'] == 'left_only'].drop(columns='_merge')
 
@@ -33,6 +45,9 @@ def select_random_rows(filtered_data, number_of_attendees,num_alternates):
 
     selected_rows = pd.DataFrame()
     alternate_rows = pd.DataFrame()
+
+    actual_number_of_attendees = number_of_attendees
+    actual_num_alternates = num_alternates
     
     # Check if num_rows is greater than the number of rows in the file
     if number_of_attendees > len(filtered_data):
@@ -61,7 +76,7 @@ def select_random_rows(filtered_data, number_of_attendees,num_alternates):
 def save_to_excel(file_name_hunt,selected_rows, alternate_rows,randomized_prev_attendee_list):
     # Get current timestamp for unique file naming
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = file_name_hunt + f"_selected_{timestamp}.xlsx"
+    file_name = f"selected_{timestamp}" + file_name_hunt + ".xlsx"
     
     # Create an Excel writer
     with pd.ExcelWriter(file_name) as writer:
@@ -83,11 +98,14 @@ def randomize_previous_attendee_list(previous_attendee_list):
 
 def main():
 
-    # Get input file
+    # Get input file - Windows
     file_path = askopenfilename(
         filetypes=[("CSV Files", "*.csv"), ("TSV Files", "*.tsv")],
         title="Select the CSV/TSV File"
     )
+
+    # Hardcoded file
+    # file_path = "/Users/triciadang/Downloads/Guest list axe-throwing-night-out 2024-11-07.csv"
 
     # Read the CSV file of event RSVPs
     original_data = pd.read_csv(file_path, sep='\t', encoding='utf-16')
@@ -120,4 +138,5 @@ def main():
         save_to_excel(file_name_hunt,selected_data,alternate_rows,randomized_prev_attendee_list)
 
 
-main()
+if __name__ == '__main__':
+    main()
