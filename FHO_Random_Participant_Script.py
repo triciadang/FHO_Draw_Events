@@ -1,7 +1,6 @@
 import pandas as pd
 import random
 from datetime import datetime
-from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from pathlib import Path
 
@@ -99,16 +98,16 @@ def randomize_previous_attendee_list(previous_attendee_list):
 def main():
 
     # Get input file - Windows
-    file_path = askopenfilename(
-        filetypes=[("CSV Files", "*.csv"), ("TSV Files", "*.tsv")],
-        title="Select the CSV/TSV File"
-    )
+    #file_path = askopenfilename(
+    #    filetypes=[("CSV Files", "*.csv"), ("TSV Files", "*.tsv")],
+    #    title="Select the CSV/TSV File"
+    #)
 
     # Hardcoded file
-    # file_path = "/Users/triciadang/Downloads/Guest list axe-throwing-night-out 2024-11-07.csv"
+    file_path = "/Users/triciadang/Downloads/Guest list fho-axis-whitetail-veterans-hunt 2024-11-13 - Guest list fho-axis-whitetail-veterans-hunt 2024-11-13.tsv"
 
     # Read the CSV file of event RSVPs
-    original_data = pd.read_csv(file_path, sep='\t', encoding='utf-16')
+    original_data = pd.read_csv(file_path, sep='\t', encoding='utf-8')
 
     # Load in list of all banned members
     banned_list = load_banned_list("Banned_Members.csv")
