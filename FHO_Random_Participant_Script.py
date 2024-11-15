@@ -40,23 +40,18 @@ def load_previous_attendee_members(previous_attendee_path):
     return already_attended_data
 
 
-def select_random_rows(filtered_data, number_of_attendees,num_alternates):
+def select_random_rows(filtered_data, number_of_attendees):
 
     selected_rows = pd.DataFrame()
     alternate_rows = pd.DataFrame()
 
     actual_number_of_attendees = number_of_attendees
-    actual_num_alternates = num_alternates
+    actual_num_alternates = len(filtered_data) - number_of_attendees
     
     # Check if num_rows is greater than the number of rows in the file
     if number_of_attendees > len(filtered_data):
         actual_number_of_attendees = len(filtered_data)
         actual_num_alternates = 0
-
-    elif (number_of_attendees + num_alternates) > len(filtered_data):
-        actual_num_alternates = len(filtered_data) - number_of_attendees
-
-    remaining_number_needed = (number_of_attendees+num_alternates) - len(filtered_data)
 
     # Randomly select rows
     if actual_number_of_attendees > 0 :
@@ -70,15 +65,17 @@ def select_random_rows(filtered_data, number_of_attendees,num_alternates):
             # Randomly select the alternate rows
             alternate_rows = remaining_data.sample(n=actual_num_alternates, random_state=random.randint(0, 10000))
     
-    return selected_rows, alternate_rows, remaining_number_needed
+    return selected_rows, alternate_rows
 
 def save_to_excel(file_name_hunt,selected_rows, alternate_rows,randomized_prev_attendee_list):
     # Get current timestamp for unique file naming
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"selected_{timestamp}" + file_name_hunt + ".xlsx"
+    
+    file_name = f"selected_{timestamp}_" + file_name_hunt + ".xlsx"
+    saved_file_path = "/Users/triciadang/Downloads/" + file_name
     
     # Create an Excel writer
-    with pd.ExcelWriter(file_name) as writer:
+    with pd.ExcelWriter(saved_file_path) as writer:
         # Write primary selected rows to the first sheet
         selected_rows.to_excel(writer, sheet_name="Primary Rows", index=False)
         
@@ -123,30 +120,31 @@ def main():
     original_data = read_csv_with_fallback_encoding(file_path)
 
     # Load in list of all banned members
-    banned_list = load_banned_list("Banned_Members.csv")
+    banned_list = load_banned_list("/Users/triciadang/Documents/Banned_Members.csv")
 
     # Load in list of all previous attendees
-    previous_attendee_list = load_banned_list("Already_Attended.csv")
+    previous_attendee_list = load_banned_list("/Users/triciadang/Documents/Already_Attended.csv")
 
     # Take out all banned members AND previous attendees from consideration
     filtered_data,previous_attendee_list_rsvps = filter_list(original_data,banned_list,previous_attendee_list)
 
     # Get numbers you need
     number_of_attendees = input("Input number of attendees: ")
-    number_of_alternates = input("Input number of alternates needed: ")
 
     # Randomly selects winners
-    selected_data,alternate_rows,remaining_number_needed = select_random_rows(filtered_data, int(number_of_attendees),int(number_of_alternates))
+    selected_data,alternate_rows = select_random_rows(filtered_data, int(number_of_attendees))
 
     randomized_prev_attendee_list = pd.DataFrame()
-    # If we still need more people to fill event, grab from those who have attended past events
-    if remaining_number_needed > 0:
-        randomized_prev_attendee_list = randomize_previous_attendee_list(previous_attendee_list_rsvps)
+
+    #Randomize list of those who already attended
+    randomized_prev_attendee_list = randomize_previous_attendee_list(previous_attendee_list_rsvps)
 
     # Write to an excel file
     if selected_data is not None and alternate_rows is not None:
         file_name_hunt = Path(file_path).name
-        file_name_hunt = file_name_hunt.split(".")[0]
+        file_name_hunt = file_name_hunt.split(".")[0].split("Guest list ")[1]
+        print(file_name_hunt)
+
         save_to_excel(file_name_hunt,selected_data,alternate_rows,randomized_prev_attendee_list)
 
 
