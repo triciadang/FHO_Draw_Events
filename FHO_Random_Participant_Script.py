@@ -95,6 +95,19 @@ def randomize_previous_attendee_list(previous_attendee_list):
     randomized_prev_attendee_list = previous_attendee_list.sample(frac=1).reset_index(drop=True)
     return randomized_prev_attendee_list
 
+
+def read_csv_with_fallback_encoding(file_path):
+    encodings=['utf-8', 'utf-16']
+    for encoding in encodings:
+        try:
+            original_data = pd.read_csv(file_path, sep='\t',encoding=encoding)
+            return original_data
+        except UnicodeDecodeError:
+            continue
+
+    raise UnicodeDecodeError("Unable to decode file with any of the specified encodings.")
+
+
 def main():
 
     # Get input file - Windows
@@ -104,10 +117,10 @@ def main():
     #)
 
     # Hardcoded file
-    file_path = "/Users/triciadang/Downloads/Guest list fho-axis-whitetail-veterans-hunt 2024-11-13 - Guest list fho-axis-whitetail-veterans-hunt 2024-11-13.tsv"
+    file_path = "/Users/triciadang/Downloads/Guest list fho-wild-game-galore-hunt 2024-11-13.csv"
 
-    # Read the CSV file of event RSVPs
-    original_data = pd.read_csv(file_path, sep='\t', encoding='utf-8')
+    # Read the CSV file of event RSVPs and try different encodings
+    original_data = read_csv_with_fallback_encoding(file_path)
 
     # Load in list of all banned members
     banned_list = load_banned_list("Banned_Members.csv")
