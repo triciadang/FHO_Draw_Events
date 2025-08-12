@@ -113,7 +113,7 @@ def read_csv_with_fallback_encoding(file_path):
 
 def main():
 
-    option = 2
+    option = 1
 
     if option == 1:
         # Get input file - Windows
@@ -125,7 +125,7 @@ def main():
     else:
         # Hardcoded file
         file_path = "/Users/triciadang/Downloads/\
-        Guest list fho-axis-whitetail-veterans-hunt 2024-11-13"
+Guest list dfw-skeet-shoot 2025-08-12.csv"
 
     # Read the CSV file of event RSVPs and try different encodings
     original_data = read_csv_with_fallback_encoding(file_path)
@@ -139,6 +139,11 @@ def main():
     # Take out all banned members AND previous attendees from consideration
     filtered_data,previous_attendee_list_rsvps = \
         filter_list(original_data,banned_list,previous_attendee_list)
+
+    # Reminder
+    sheet_check = input("Did you check the sheet?")
+    if sheet_check == "no" or sheet_check == "n":
+        quit
 
     # Get numbers you need
     number_of_attendees = input("Input number of attendees: ")
