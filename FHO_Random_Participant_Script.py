@@ -118,8 +118,7 @@ def main():
     if option == 1:
         # Get input file - Windows
         file_path = askopenfilename(
-            filetypes=[("CSV Files", "*.csv"), ("TSV Files", "*.tsv")],
-            title="Select the CSV/TSV File"
+            title="Select the File"
             )
 
     else:
