@@ -36,6 +36,8 @@ def filter_list(original_data, banned_list,previous_attendee_list):
         previous_attendee_list,on=['First name','Last name'],how='inner'
         )
 
+    previous_attendee_list_rsvps = previous_attendee_list_rsvps.drop_duplicates(subset=['First name','Last name'])
+
     return filtered_data, previous_attendee_list_rsvps
 
 
@@ -113,7 +115,7 @@ def read_csv_with_fallback_encoding(file_path):
 
 def main():
 
-    option = 1
+    option = 2
 
     if option == 1:
         # Get input file - Windows
@@ -124,7 +126,7 @@ def main():
     else:
         # Hardcoded file
         file_path = "/Users/triciadang/Downloads/\
-Guest list dfw-skeet-shoot 2025-08-12.csv"
+Guest list dove-hunt-at-burns-ranch 2025-09-02.csv"
 
     # Read the CSV file of event RSVPs and try different encodings
     original_data = read_csv_with_fallback_encoding(file_path)
@@ -133,7 +135,7 @@ Guest list dfw-skeet-shoot 2025-08-12.csv"
     banned_list = load_banned_list("/Users/triciadang/Documents/Banned_Members.csv")
 
     # Load in list of all previous attendees
-    previous_attendee_list = load_banned_list("/Users/triciadang/Documents/Already_Attended.csv")
+    previous_attendee_list = load_previous_attendee_members("/Users/triciadang/Documents/Already_Attended.csv")
 
     # Take out all banned members AND previous attendees from consideration
     filtered_data,previous_attendee_list_rsvps = \
